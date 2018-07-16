@@ -20,8 +20,8 @@ import re
 
 def get_forms(html_code):
 	"""
-	 get list of forms (<form method=* ...> ... </form>) 
-	 that contain some http request
+	Function returns list of forms (<form method=* ...> ... </form>) 
+	that contain some http request
 	"""
 	forms = []
 	for match in re.finditer("<form.*\n?method", html_code):
@@ -51,7 +51,7 @@ def get_html_variable_value(var, html_code):
 
 def get_input_tags(html_form):
 	"""
-	 get list of <input ... > tags in html form
+	 Function return list of <input ... > tags in html form
 	"""
 	input_tags = []
 	for match in re.finditer("<input", html_form):
@@ -124,8 +124,6 @@ def get_form_class(html_form):
 
 
 
-# e.g. if input_tags = ['<input type="hidden" name="var1" value="0">', '<input type="hidden" name="var2">]
-# function will return { 'var1' : ['hidden', '0'], 'var2' : ['hidden', 'none'] }
 def get_input_variables(input_tags):
 	"""
 	 e.g. if input_tags = ['<input type="hidden" name="var1" value="0">', '<input type="hidden" name="var2">]
@@ -189,7 +187,7 @@ def inspect_form(html_form):
 
 def guess_login_form(html_forms):
 	"""
-	 finds all matches of keywords (password, login, etc.)
+	 Finds all matches of keywords (password, login, etc.)
 	 and returns form_id (its position in html_forms list)
 	 of form that have max number of matches
 	"""
