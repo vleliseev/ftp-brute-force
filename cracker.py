@@ -351,16 +351,6 @@ def ask_num_threads():
 
 ### START PROGRAM ###
 if __name__ == "__main__":
-	url = 'https://facebook.com/login.php'
-	resp = bf.make_empty_get_request(url)
-
-	target = inspect_page(resp.text)
-	target.cookies = resp.cookies
-	target.headers = resp.headers
-	target.url = url
-	ask_login_form(target)
-	target.generate_request_body()
-	print(target.url)
-	#main()
+	main()
 ### PROGRAM FINISHED ###
 
