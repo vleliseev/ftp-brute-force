@@ -17,4 +17,4 @@ HTTP(s) login/pass brute forcer
 * Add ability to execute script with arguments
 * Provide command of setting whole HTTP request pattern without program participating
 * Expand and write clear 'help'
-
+* Ability to find Query string params and add them to HTTP request pattern
