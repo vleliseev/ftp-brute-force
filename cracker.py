@@ -72,6 +72,8 @@ class target:
 		if self.login_form_id == -1:
 			return None
 		self.login_form = self.html_forms[login_form_id]
+		self.login_var = hp.guess_login_variable(self.get_login_form_variables())
+		self.pass_var = hp.guess_pass_variable(self.get_login_form_variables())
 
 
 	# returns input variables of login form
@@ -267,13 +269,13 @@ def start(url):
 	target.headers = resp.headers
 	if not target.url:
 		target.url = url
-	target.generate_request_body()	
 
 	ask_login_form(target)
 	ask_login_var(target)
 	ask_password_var(target)
 	target.unsuccess_sign = ask_unsuccess_sign()
 	num_threads = int(ask_num_threads())
+	target.generate_request_body()	
 
 	print('Starting brute force attack.')
 	#bf.brute_force(target, logins, passwords, num_threads)
