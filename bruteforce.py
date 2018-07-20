@@ -22,8 +22,8 @@ print_lock = threading.Lock()
 ### END PRINT LOCK ###
 
 def make_request(pattern, login, password):
-	pattern.request_body[pattern.login_var] = login
-	pattern.request_body[pattern.pass_var] = password
+	pattern.substitute_login(login)
+	pattern.substitute_password(password)
 	response = requests.request(pattern.http_method, 
 				pattern.url, 
 				data = pattern.request_body,
@@ -38,7 +38,7 @@ def parse_response(response, unsuccess_sign):
 	 if auth request was unsuccessful.
 	 e.g. "Failed login attemp.", "Error. Try again.", etc.
 	"""
-	if response.text.find(unsuccess_sign):
+	if response.text.find(unsuccess_sign) != -1:
 		return 'UNSUCCESS'
 	else:
 		return '[!] SUCCESS [!]'
