@@ -35,12 +35,9 @@ import requests
 
 # ================================= REQUEST_PATTERN CLASS ================================= #
 """
-Class 'target' contains main information about html code of target page:
-	* all html forms (<form method=...> ... </form>) found in code;
-	* login_form that has login and password input (guessed by program or specified by user);
-	* login_form_id that is actually its index in html_forms list;
-	* login_var - name variable that holds login user input 
-	* pass_var - the same as login_var, but holds password user input
+Class RequestPattern stores information about http request
+for brute force attack (url, cookie, headers, etc.)
+It also provides substitute login/password functions for dictionary attack
 """
 	
 class RequestPattern:
@@ -54,6 +51,41 @@ class RequestPattern:
 		self.login_var = str()
 		self.pass_var = str()
 		self.http_method = str()
+	
+
+	def __query_to_dict(self):
+		tmp = { }
+		for item in self.query.split('&'):
+			key = item.split('=')[0]
+			value = item.split('=')[1]
+			tmp[key] = value
+		self.query = tmp
+	
+	def __query_to_str(self):
+		tmp = '?'
+		for key, value in self.query.items():
+			tmp += key + '=' + value + '&'
+		self.query = tmp[:-1] # remove last '&' symbol
+			
+	
+	def set_query_var_value(self, var, value):
+		self.__query_to_dict()
+		self.query[var] = value
+		self.__query_to_str()
+
+
+	def substitute_login(self, login):
+		if self.login_var in self.request_body:
+			self.request_body[self.login_var] = login
+		elif self.query.find(self.login_var) != -1:
+			self.set_query_var_value(self.login_var, login)
+
+
+	def substitute_password(self, password):
+		if self.pass_var in self.request_body:
+			self.request_body[self.pass_var] = password
+		elif self.query.find(self.pass_var) != -1:
+			self.set_query_var_value(self.pass_var, password)
 	
 # ================================= CLASS END ================================= #		
 
@@ -79,7 +111,7 @@ def define_args():
 	parser.add_argument('-m', metavar = "HTTP_METHOD", required = True, help = 'set http request method (POST, GET, etc.)')
 
 	parser.add_argument('-t', metavar = 'THREADS', type = int , default = 3, help = 'set number of threads to use (default: 3)')
-	parser.add_argument('target', help = 'set target host (specify login action if it exists) e.g. https://target.com/login.php')
+	parser.add_argument('target', help = 'set target website (specify login action if it exists) e.g. https://target.com/login.php')
 	parser.add_argument('--reverse', '-r', action = 'store_false', help = 'set brute force attack type')
 	return parser
 
