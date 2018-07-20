@@ -29,9 +29,6 @@ def make_request(pattern, login, password):
 				data = pattern.request_body,
 				cookies = pattern.cookies
 				)
-	fl = open('out.txt', 'w')
-	fl.write(response.text)
-	fl.close()
 	return response
 
 
