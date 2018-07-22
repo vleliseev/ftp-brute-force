@@ -25,6 +25,7 @@ def make_request(pattern, login, password):
 	pattern.substitute_login(login)
 	pattern.substitute_password(password)
 	response = requests.request(pattern.http_method, 
+				headers = pattern.headers,
 				pattern.url, 
 				data = pattern.request_body,
 				cookies = pattern.cookies
