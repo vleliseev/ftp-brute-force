@@ -12,6 +12,6 @@ HTTP(s) login/pass brute forcer
 * Program makes pattern HTTP request based on user input
 * Brute force works with both HTTP and HTTPS because script does not sniff any packets to intercept them
 
-### To do
+### Warning
 
-* Add colored output
+Script was tested with little banch of websites, so it might not work with some other.
