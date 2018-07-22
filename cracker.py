@@ -112,7 +112,7 @@ def define_args():
 
 	parser.add_argument('-t', metavar = 'THREADS', type = int , default = 3, help = 'set number of threads to use (default: 3)')
 	parser.add_argument('target', help = 'set target website (specify login action if it exists) e.g. https://target.com/login.php')
-	parser.add_argument('--reverse', '-r', action = 'store_false', help = 'set brute force attack type')
+	parser.add_argument('--reverse', '-r', action = 'store_true', help = 'set brute force attack type')
 	return parser
 
 
@@ -126,6 +126,8 @@ def main(args):
 	num_threads = 3 
 	url = args['target']
 	method = args['m']
+	reverse = args['reverse']
+	
 	
 	# set brute force login(s) #
 	if login_dict_path:
@@ -152,12 +154,13 @@ def main(args):
 	request_pattern = generate_request_pattern()
 	request_pattern.url = url + request_pattern.query
 	request_pattern.http_method = method
-	print('Getting Cookie...')
-	request_pattern.cookies = requests.get(request_pattern.url).cookies
-	print('Done.')
+	if 'Cookie' not in request_pattern.headers.keys():
+		print('Getting Cookie...')
+		request_pattern.cookies = requests.get(request_pattern.url).cookies
+		print('Done.')
 	
 	# brute force attack #
-	bf.brute_force(request_pattern, logins, passwords, num_threads)
+	bf.brute_force(request_pattern, logins, passwords, num_threads, reverse)
 	
 	
 
@@ -175,12 +178,12 @@ def main(args):
 def ask_http_headers():
 	print('Set http headers: ')
 	headers = { }
-	header = input()
+	header = input().replace(': ', ':')
 	while header:
 		key = header.split(':')[0]
 		value = header.split(':')[1]
 		headers[key] = value
-		header = input()
+		header = input().replace(': ', ':')
 	return headers
 
 
@@ -278,5 +281,6 @@ def generate_request_pattern():
 if __name__ == "__main__":
 	parser = define_args()
 	args = vars(parser.parse_args())
+	print(args)
 	main(args)
 ### PROGRAM FINISHED ###
