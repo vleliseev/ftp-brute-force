@@ -281,6 +281,5 @@ def generate_request_pattern():
 if __name__ == "__main__":
 	parser = define_args()
 	args = vars(parser.parse_args())
-	print(args)
 	main(args)
 ### PROGRAM FINISHED ###
