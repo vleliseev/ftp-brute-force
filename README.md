@@ -14,4 +14,4 @@ HTTP(s) login/pass brute forcer
 
 ### Warning
 
-Script was tested with little banch of websites, so it might not work with some other.
+Script was tested with little banch of websites, so it may not work with some other.
