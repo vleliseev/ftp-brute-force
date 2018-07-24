@@ -57,12 +57,7 @@ def dict_attack(request_pattern, queue, password_list):
 		for passwd in password_list:
 			response = make_request(request_pattern, login, passwd)
 			with print_lock:
-				print('Trying ' 
-				     + login 
-				     + ' : '
-				     + passwd
-				     , end = ' '
-				     )
+				print("Trying {} : {} ".format(login, passwd), end = ' ')
 				result = parse_response(response, request_pattern.unsuccess_sign)
 				print(result)
 		queue.task_done()
@@ -79,12 +74,7 @@ def reverse_dict_attack(request_pattern, login_list, queue):
 		for login in login_list:
 			response = make_request(request_pattern, login, passwd)
 			with print_lock:
-				print('Trying ' 
-				     + login 
-				     + ' : '
-				     + passwd
-				     , end = ' '
-				     )
+				print("Trying {} : {} ".format(login, passwd), end = ' ')
 				result = parse_response(response, request_pattern.unsuccess_sign)
 				print(result)
 		queue.task_done()
