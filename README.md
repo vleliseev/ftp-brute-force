@@ -1,17 +1,23 @@
 # http-brute-forcer
-HTTP(s) login/pass brute forcer 
+HTTP(s) html login/pass  brute force cracker
 
-### Setup
+### Dependenses
 
-  Before launching the cracker.py (main script) make sure that you have python3 with requests and argparse modules installed.
-  To start script just launch it with python intepreter.
+ * [Firefox browser](https://www.mozilla.org/en-US/firefox/)
+ * Web driver for firefox - [geckodriver](https://github.com/mozilla/geckodriver/releases)
+ * [Selenium](https://docs.seleniumhq.org/) module for python 3
+ * [argparse](https://pypi.org/project/argparse/) module for python 3
+ 
 
 ### Features
 
-* Cracker provides multithreading login/password pair dictionary attacks on different websites 
-* Program makes pattern HTTP request based on user input
-* Brute force works with both HTTP and HTTPS because script does not sniff any packets to intercept them
+* Cracker provides multithreading login/password pair dictionary attacks on different websites
+* Program uses selenium browser automation so you can observe attack process
+* It works with html forms that make HTTP(s) requests with login/pass data
 
 ### Warning
 
-Script was tested with little banch of websites, so it may not work with some other.
+* Script does not work with websites that have javascript authentication (instead of html form)
+* It can't recognize captcha
+* Do not use many threads for attack: your machine may fail with handling several webdrivers at the same time.
+
