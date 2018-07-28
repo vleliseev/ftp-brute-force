@@ -17,6 +17,7 @@
 import threading
 from queue import Queue
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 import time
 import os
 
@@ -76,10 +77,13 @@ class TargetObj:
 
 
 	def parse_reponse(self):
-		if self.failure_sign in self.__driver.page_source:
-			return True
-		else:
+		xpath = "//*[contains(text(), '{}')]".format(self.failure_sign)
+		try:
+			elem = self.__driver.find_element_by_xpath(xpath)
 			return False
+		except NoSuchElementException:
+			return True
+
 
 	def exit_driver(self):
 		self.__driver.quit()
