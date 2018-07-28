@@ -143,40 +143,40 @@ def define_args():
 	define_password_group(password_group)
 
 	parser.add_argument('-t'
-						, metavar = 'THREADS'
-						, type = int
-						, default = 1
-						, help = 'set number of threads to use (default: 3)')
+                            , metavar = 'THREADS'
+                            , type = int
+                            , default = 1
+                            , help = 'set number of threads to use (default: 3)')
 
 	parser.add_argument('target'
-						, help = 'set target website (specify login action)' \
-						' e.g. https://target.com/login.php')
+                            , help = 'set target website (specify login action)' \
+                             ' e.g. https://target.com/login.php')
 
 	parser.add_argument('--reverse'
-						, '-r'
-						, action = 'store_true'
-						, help = 'set brute force attack type')
+                            , '-r'
+                            , action = 'store_true'
+                            , help = 'set brute force attack type')
 	return parser
 
 
 def define_login_group(login_group):
 		login_group.add_argument('-l'
-								, metavar = 'LOGIN'
-								, help = 'set attack login')
+                                         , metavar = 'LOGIN'
+                                         , help = 'set attack login')
 
 		login_group.add_argument('-L'
-		 						, metavar = 'dict.txt'
-								, help = 'set login dictionary')
+                                         , metavar = 'dict.txt'
+                                         , help = 'set login dictionary')
 
 
 def define_password_group(password_group):
 		password_group.add_argument('-p'
-									, metavar = 'PASSWORD'
-									, help = 'set attack password')
+                                            , metavar = 'PASSWORD'
+                                            , help = 'set attack password')
 
 		password_group.add_argument('-P'
-									, metavar = 'dict.txt'
-									, help = 'set password dictionary')
+                                            , metavar = 'dict.txt'
+                                            , help = 'set password dictionary')
 
 
 
