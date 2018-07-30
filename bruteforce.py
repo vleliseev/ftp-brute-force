@@ -27,6 +27,7 @@ import os
 print_lock = threading.Lock()
 ### END PRINT LOCK ###
 
+
 class TargetObj:
 	def __init__(self, target_info):
 		# new driver for new thread #
@@ -77,6 +78,7 @@ class TargetObj:
 
 
 	def parse_reponse(self):
+		# looking for html element with failure sign #
 		xpath = "//*[contains(text(), '{}')]".format(self.failure_sign)
 		try:
 			elem = self.__driver.find_element_by_xpath(xpath)
@@ -124,7 +126,7 @@ def reverse_dict_attack(target_obj, login_list, queue):
 
 def brute_force(target_info, logins, passwords, num_threads, reverse = False):
 	q = Queue()
-	# this list need to quit all drivers after finishing attack #
+	# list with objects of TargetObj class #
 	target_objs = []
 	if reverse == False:
 		for thread_counter in range(num_threads):
@@ -132,7 +134,7 @@ def brute_force(target_info, logins, passwords, num_threads, reverse = False):
 			obj_per_thread = TargetObj(target_info)
 			target_objs.append(obj_per_thread)
 			thrd = threading.Thread(target = dict_attack
-									, args = (obj_per_thread, q, passwords))
+                                    , args = (obj_per_thread, q, passwords))
 			thrd.daemon = True
 			thrd.start()
 
@@ -143,7 +145,7 @@ def brute_force(target_info, logins, passwords, num_threads, reverse = False):
 			obj_per_thread = TargetObj(target_info)
 			target_objs.append(obj_per_thread)
 			thrd = threading.Thread(target = reverse_dict_attack
-									, args = (obj_per_thread, logins, q))
+                                    , args = (obj_per_thread, logins, q))
 			thrd.daemon = True
 			thrd.start()
 
@@ -151,5 +153,6 @@ def brute_force(target_info, logins, passwords, num_threads, reverse = False):
 			q.put(passwd)
 	q.join()
 
+	# quit drivers #
 	for obj in target_objs:
 		obj.exit_driver();

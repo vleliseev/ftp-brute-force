@@ -1,13 +1,13 @@
 # http-brute-forcer
-HTTP(s) html login/pass  brute force cracker
+HTTP(s) HTML login/pass  brute force cracker
 
-### Dependenses
+### Dependencies
 
  * [Firefox browser](https://www.mozilla.org/en-US/firefox/)
  * Web driver for firefox - [geckodriver](https://github.com/mozilla/geckodriver/releases)
  * [Selenium](https://docs.seleniumhq.org/) module for python 3
  * [argparse](https://pypi.org/project/argparse/) module for python 3
- 
+
 
 ### Features
 
@@ -17,7 +17,6 @@ HTTP(s) html login/pass  brute force cracker
 
 ### Warning
 
-* Script does not work with websites that have javascript authentication (instead of html form)
+* Script works only with html based authentication
 * It can't recognize captcha
-* Do not use many threads for attack: your machine may fail with handling several webdrivers at the same time.
-
+* Do not use many threads for attack: your machine may fail with handling several webdrivers at the same time
