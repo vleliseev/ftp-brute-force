@@ -1,14 +1,5 @@
 #! /usr/bin/python3
 
-
-### APP HEADERS ###
-__author__ = "Vlad Eliseev"
-__license__ = "GNU GPLv3"
-__email__ = "shmelv3@yandex.ru"
-__status__ = "Development"
-### END HEADERS ###
-
-
 ### TODO ###
 # * add colored output
 # * add tqdm
