@@ -70,7 +70,7 @@ class TargetObj:
 				try:
 					self.__pass_input.submit()
 				except:
-					print(ATTEMP_ERROR)
+					print(ATTEMPT_ERROR)
 					self.__driver.quit()
 		time.sleep(1)
 
@@ -92,7 +92,7 @@ class TargetObj:
 
 
 
-def login_attemp(target_obj, login, password):
+def login_attempt(target_obj, login, password):
 	target_obj.substitute_login(login)
 	target_obj.substitute_password(password)
 	target_obj.submit()
@@ -109,18 +109,18 @@ def dict_attack(target_obj, queue, password_list):
 	while True:
 		login = queue.get()
 		for passwd in password_list:
-			result = login_attemp(target_obj, login, passwd)
+			result = login_attempt(target_obj, login, passwd)
 			with print_lock:
-				print(LOGIN_ATTEMP.format(login, passwd, result))
+				print(LOGIN_ATTEMPT.format(login, passwd, result))
 		queue.task_done()
 
 
 def reverse_dict_attack(target_obj, login_list, queue):
 	password = queue.get()
 	for login in login_list:
-		result = login_attemp(target_obj, login, password)
+		result = login_attempt(target_obj, login, password)
 		with print_lock:
-				print(LOGIN_ATTEMP.format(login, passwd, result))
+				print(LOGIN_ATTEMPT.format(login, passwd, result))
 		queue.task_done()
 
 

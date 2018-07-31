@@ -73,7 +73,7 @@ def ask_failure_sign():
 	 Function asks user to set failure sign.
 	 failure_sign is string that is stored in html code of page
 	 if auth request was unsuccessful.
-	 e.g. "Failed login attemp.", "Error. Try again.", etc.
+	 e.g. "Failed login attempt.", "Error. Try again.", etc.
 	"""
 	return input('Set failure sign (look help for more info): ')
 

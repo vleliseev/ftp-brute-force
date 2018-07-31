@@ -12,6 +12,6 @@ __status__ = "Development"
 LOGIN_INPUT_ERROR = 'Unable to get login input.'
 PASSWORD_INPUT_ERROR = 'Unable to get password input.'
 XPATH_CONTAINS = "//{}[contains({}, '{}')]"
-ATTEMP_ERROR = "Login attemp error."
-LOGIN_ATTEMP = 'Tried {} : {} - {}'
+ATTEMPT_ERROR = "Login attemp error."
+LOGIN_ATTEMPT = 'Tried {} : {} - {}'
 ### END CONSTANTS ###
