@@ -1,47 +1,26 @@
-## ========================================================================= ##
-##                                                                           ##
-## Author : Eliseev Vlad                                                     ##
-## Contact link : https://github.com/shmel3                                  ##
-## License : All entire code is published under a GNU GPLv3 license          ##
-##                                                                           ##
-## =============================== Notes from author ======================= ##
-##                                                                           ##
-## This program was written in educational purposes.                         ##
-## Please, never use it with malicious intent.                               ##
-## You are free to use any of this code in your program, but I would be      ##
-## grateful if you leave my contact link in it.                              ##
-##                                                                           ##
-## ========================================================================= ##
+#! /usr/bin/python3
+
+
+### APP HEADERS ###
+__author__ = "Vlad Eliseev"
+__license__ = "GNU GPLv3"
+__email__ = "shmelv3@yandex.ru"
+__status__ = "Development"
+### END HEADERS ###
+
 
 ### TODO ###
 # * add colored output
 # * add tqdm
+# * fix BrokenPipeError (timeout)
 ### END TODO ###
 
 
-
 ### IMPORT MODULES ###
-import bruteforce as bf
+from bruteforce import brute_force
+from bruteforce import TargetObj
 import argparse
 ### END MODULES ###
-
-
-
-
-# ============================== TARGET_INFO CLASS =========================== #
-"""
-Class TargetInfo stores information about target website
-for brute force attack (url, login variable name, etc.)
-It also provides substitute login/password functions for dictionary attack
-"""
-
-class TargetInfo:
-	def __init__(self):
-		self.url = str()
-		self.login_var_name = str()
-		self.password_var_name = str()
-		self.unsuccess_sign = str()
-
 
 
 
@@ -81,12 +60,12 @@ def main(args):
 
 
 	print('Starting brute force attack.')
-	# generating TargetInfo with user input #
-	target_info = get_target_info()
-	target_info.url = url
+	# generating TargetObj class variables with user input #
+	get_target_info()
+	TargetObj.url = url
 
 	# brute force attack #
-	bf.brute_force(target_info, logins, passwords, num_threads, reverse)
+	brute_force(logins, passwords, num_threads, reverse)
 
 
 
@@ -96,7 +75,7 @@ def main(args):
 
 
 
-# =============================== APPLICATION COMMANDS ======================= #
+# =============================== USER INPUT ================================ #
 
 def ask_failure_sign():
 	"""
@@ -115,21 +94,22 @@ def ask_password_var():
 	pass_var = input('Password variable: ')
 	return pass_var
 
+def ask_login_button():
+	login_button_text = input('Login button text:');
+	return login_button_text
+
 def get_target_info():
 	"""
 	Get information about attack target:
 		* login varaible name,
 		* password variable name,
 		* failure sign.
-	And return object of TargetInfo class.
+	And set TargetObj static variables with provided values.
 	"""
-	info = TargetInfo()
-	info.login_var_name = ask_login_var()
-	info.password_var_name = ask_password_var()
-	info.failure_sign = ask_failure_sign()
-	return info
-
-
+	TargetObj.login_var = ask_login_var()
+	TargetObj.pass_var = ask_password_var()
+	TargetObj.failure_sign = ask_failure_sign()
+	TargetObj.button_text = ask_login_button()
 
 
 
