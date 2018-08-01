@@ -16,7 +16,7 @@ HTTP(s) HTML login/pass  brute force cracker
 * It works with html forms that make HTTP(s) requests with login/pass data
 
 ### Usage
-![example-gif](https://github.com/shmel3/test/blob/master/example.gif)
+![example-gif](https://github.com/shmel3/http-brute-forcer/blob/master/example/example.gif)
 
 
 ### Warning
