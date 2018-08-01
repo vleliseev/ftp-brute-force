@@ -24,3 +24,4 @@ HTTP(s) HTML login/pass  brute force cracker
 * Script works only with html based authentication
 * It can't recognize captcha
 * Do not use many threads for attack: your machine may fail with handling several webdrivers at the same time
+* Please, NEVER use it with malicious intent
