@@ -15,6 +15,10 @@ HTTP(s) HTML login/pass  brute force cracker
 * Program uses selenium browser automation so you can observe attack process
 * It works with html forms that make HTTP(s) requests with login/pass data
 
+### Usage
+![example-gif](https://github.com/shmel3/test/blob/master/example.gif)
+
+
 ### Warning
 
 * Script works only with html based authentication
