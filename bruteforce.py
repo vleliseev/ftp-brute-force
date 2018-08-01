@@ -54,11 +54,11 @@ class TargetObj:
 
 	def submit(self):
 		button_xpath = XPATH_CONTAINS.format('button'
-                                             , '.'
-                                             , TargetObj.button_text)
+                                                     , '.'
+                                                     , TargetObj.button_text)
 		input_xpath = XPATH_CONTAINS.format('input'
-		                                    , '.'
-                                                    , TargetObj.button_text)
+						    , '.'
+						    , TargetObj.button_text)
 		try:
 			button = self.__driver.find_element_by_xpath(button_xpath)
 			button.click()
