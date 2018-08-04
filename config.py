@@ -14,4 +14,5 @@ PASSWORD_INPUT_ERROR = 'Unable to get password input.'
 XPATH_CONTAINS = "//{}[contains({}, '{}')]"
 ATTEMPT_ERROR = "Login attemp error."
 LOGIN_ATTEMPT = 'Tried {} : {} - {}'
+TIME_PAUSE = 1 # seconds #
 ### END CONSTANTS ###

