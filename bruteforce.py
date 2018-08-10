@@ -32,7 +32,7 @@ class TargetObj:
 		return self.__driver.find_element_by_name(var_name)
 
 	def substitute_login(self, login):
-		def set_login_input(login):
+		def set_login_input():
 			self.__login_input = self.__get_input(TargetObj.login_var)
 			self.__login_input.clear()
 			self.__login_input.send_keys(login)
@@ -47,10 +47,10 @@ class TargetObj:
 				self.__driver.close()
 
 	def substitute_password(self, password):
-		def set_pass_input(password):
+		def set_pass_input():
 			self.__pass_input = self.__get_input(TargetObj.pass_var)
-			self.__pass_input = self.clear()
-			self.__pass_input = self.send_keys(password)
+			self.__pass_input.clear()
+			self.__pass_input.send_keys(password)
 		try:
 			set_pass_input(password)
 		except NoSuchElementException:
