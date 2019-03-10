@@ -1,4 +1,4 @@
-# http-brute-forcer
+# ftp-brute-forcer
 FTP auth brute force tool
 
 ### Dependencies
