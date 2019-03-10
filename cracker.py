@@ -1,6 +1,5 @@
 ### TODO ###
-# * add colored output
-# * add tqdm
+# Add PAndas and opt. loading dictionaries to memory
 ### END TODO ###
 
 
@@ -19,10 +18,11 @@ def main(args):
 	login_dict_path = args['L']
 	password = args['p']
 	password_dict_path = args['P']
-	num_threads = 1
+	num_threads = args['t']
 	host = args['host']
 	port = args['port']
 	reverse = args['reverse']
+	delay = args['delay']
 
 
 	# Set brute force login(s)
@@ -39,13 +39,8 @@ def main(args):
 	elif password:
 		passwords.append(password)
 
-	# Specify number of threads to use
-	if 't' in args:
-		num_threads = args['t']
-
-
 	# Start brute force attack
-	brute_force(host, port, logins, passwords, num_threads, reverse)
+	brute_force(host, port, logins, passwords, num_threads, delay, reverse)
 
 
 
@@ -65,41 +60,47 @@ def define_args():
                         , help = 'Set number of threads (default: 1)')
 
 	parser.add_argument('host'
-                        , help = 'Set target host IPv4 ')
+                        , help = 'Set target host')
 
 	parser.add_argument('--port'
-						, metavar = 'PORT'
-						, type = int
-						, default = 21
+			, metavar = 'PORT'
+				, type = int
+				, default = 21
                         , help = 'Set ftp port, default is 21')
+	parser.add_argument('--delay'
+			, '-d'
+			, metavar = 'DELAY'
+			, type = float
+			, default = 0.5
+                        , help = 'Delay between attempts in seconds')
 
 	parser.add_argument('--reverse'
                         , '-r'
                         , action = 'store_true'
                         , help = 'Set brute force attack type. Default' \
-								 'attack type is login:password[i],' \
-								 'reverse is login[i]:password')
+				 'attack type is login:password[i],' \
+				 'reverse is login[i]:password')
 	return parser
 
 
 def define_login_group(login_group):
 		login_group.add_argument('-l'
-								 , metavar = 'LOGIN'
-								 , help = 'Set login')
+					, metavar = 'LOGIN'
+					, help = 'Set login')
 
 		login_group.add_argument('-L'
-								 , metavar = 'dict.txt'
-								 , help = 'Set login dictionary')
+					, metavar = 'dict.txt'
+					, help = 'Set login dictionary')
 
 
 def define_password_group(password_group):
 		password_group.add_argument('-p'
-									, metavar = 'PASSWORD'
-									, help = 'Set password')
+					, metavar = 'PASSWORD'
+					, help = 'Set password')
 
 		password_group.add_argument('-P'
-									, metavar = 'dict.txt'
-									, help = 'Set password dictionary')
+					, metavar = 'dict.txt'
+					, help = 'Set password dictionary')
 
 
 

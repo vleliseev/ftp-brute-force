@@ -11,7 +11,6 @@ __status__ = "Development"
 ### APP CONSTANTS ###
 LOGIN_ATTEMPT = '{} ' + Fore.CYAN + 'Tried ' + Fore.WHITE + '{}:{}'
 CONNECTION_ERROR = Fore.RED + 'Error: ' + Fore.WHITE + 'bad response code.'
-DELAY = 0.5 # seconds #
 SUCCESS = Fore.GREEN + '[+]'
 FAILURE = Fore.RED + '[-]'
 CRLF = '\r\n'
